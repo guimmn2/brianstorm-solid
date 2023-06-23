@@ -10,11 +10,14 @@ type Suggestion = {
 
 export default function BrainstormPage() {
     const params = useParams()
+    let inputRef!: HTMLInputElement
+    let brainstormTheme: string
     const [addingSuggestion, suggest] = createRouteAction(suggestFn)
     const [suggestions, { mutate }] = createResource(async () => {
         //fetch list
         const response = await pb.collection('suggestions').getFullList({
-            filter: `brainstormId = "${params.id}"`
+            filter: `brainstormId = "${params.id}"`,
+            expand: 'brainstormId'
         })
         let suggestions: Suggestion[] = []
         response.forEach(rec => {
@@ -30,7 +33,8 @@ export default function BrainstormPage() {
     const orderedSuggestions = () => suggestions()?.sort((a, b) => b.votes - a.votes)
 
     //subscribe to chnages
-    //had to use onMount so the subscription only runs in the client
+    //had to use onMount `so the subscription only runs in the client
+    //--
     onMount(() => pb.collection('suggestions').subscribe('*', ({ action, record }) => {
         if (record.brainstormId != params.id) {
             return
@@ -51,6 +55,7 @@ export default function BrainstormPage() {
             }))
         }
     }))
+    //--
 
     return (
         <>
@@ -73,10 +78,10 @@ export default function BrainstormPage() {
                         </>
                 }
             </For>
-            <suggest.Form>
+            <suggest.Form onSubmit={() => setTimeout(() => inputRef.value = "")}>
                 <input type="hidden" name="brainstormId" value={params.id} />
                 <label for="suggestion">Add suggestion</label>
-                <input type="text" name="suggestion" id="suggestion" />
+                <input ref={inputRef} type="text" name="suggestion" id="suggestion" disabled={addingSuggestion.pending}/>
             </suggest.Form>
         </>
     )
