@@ -1,5 +1,5 @@
 import { For, createResource, onMount } from "solid-js"
-import { RouteDataArgs, createRouteAction, createRouteData, useParams, useRouteData } from "solid-start"
+import { createRouteAction, redirect, useParams } from "solid-start"
 import { pb } from "~/pocketbase"
 
 type Suggestion = {
@@ -10,7 +10,8 @@ type Suggestion = {
 
 export default function BrainstormPage() {
     const params = useParams()
-    const [suggestions, { mutate, refetch }] = createResource(async () => {
+    const [addingSuggestion, suggest] = createRouteAction(suggestFn)
+    const [suggestions, { mutate }] = createResource(async () => {
         //fetch list
         const response = await pb.collection('suggestions').getFullList({
             filter: `brainstormId = "${params.id}"`
@@ -25,6 +26,8 @@ export default function BrainstormPage() {
         })
         return suggestions
     })
+    
+    const orderedSuggestions = () => suggestions()?.sort((a, b) => b.votes - a.votes)
 
     //subscribe to chnages
     //had to use onMount so the subscription only runs in the client
@@ -51,7 +54,7 @@ export default function BrainstormPage() {
 
     return (
         <>
-            <For each={suggestions()}>
+            <For each={orderedSuggestions()}>
                 {
                     (sug) =>
                         <>
@@ -70,6 +73,24 @@ export default function BrainstormPage() {
                         </>
                 }
             </For>
+            <suggest.Form>
+                <input type="hidden" name="brainstormId" value={params.id} />
+                <label for="suggestion">Add suggestion</label>
+                <input type="text" name="suggestion" id="suggestion" />
+            </suggest.Form>
         </>
     )
+}
+
+async function suggestFn(form: FormData) {
+    const brainstormId = form.get('brainstormId') as string
+    const suggestion = form.get('suggestion') as string
+    const response = await pb.collection('suggestions').create({
+        brainstormId: brainstormId,
+        suggestion: suggestion,
+        votes: 0
+    })
+    if (response) {
+        return redirect(useParams().id)
+    }
 }
