@@ -14,17 +14,24 @@ export default function Home() {
   })
 
   return (
-    <main class="flex flex-col justify-center h-80 text-5xl">
+    <main>
       <Title>Brianstorm</Title>
-      <h1 class="mb-4 self-center">What do you wish to Brainstorm ?</h1>
-      <setSubject.Form>
-        <input
-          class="w-full h-12 px-4 py-2 text-lg rounded-lg shadow-lg"
-          type="text"
-          name="subject"
-          placeholder="what do you wish to brainstorm ?"
-        />
-      </setSubject.Form>
+      <div class="flex flex-col ml-12 mt-12">
+      <h1 class="text-5xl mt-4">What do you wish to Brainstorm?</h1>
+        <setSubject.Form class="mt-4">
+          <input
+            type="text"
+            name="subject"
+            class="px-4 py-2 text-lg bg-gray-200 rounded-lg w-10/12 h-12"
+            placeholder="What do you wish to brainstorm?"
+          />
+          <input 
+          type="submit" 
+          value="GO"
+          class="bg-orange-500 rounded-lg w-1/12 h-12 ml-4 text-white text-lg hover:bg-orange-700 font-bold cursor-pointer"
+          />
+        </setSubject.Form>
+      </div>
     </main>
-  );
+  )
 }
