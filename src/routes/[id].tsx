@@ -77,20 +77,13 @@ export default function BrainstormPage() {
             <For each={orderedSuggestions()}>
                 {
                     (sug) =>
-                        <>
-                            <p>{sug.description}</p>
-                            <p>{sug.votes}</p>
-                            <button onClick={async () => {
-                                const response = await pb.collection('suggestions').update(sug.id, {
-                                    suggestion: sug.description,
-                                    votes: sug.votes + 1,
-                                    brainstormId: params.id
-                                })
-                                if (response) {
-                                    console.log('vote with sucess')
-                                }
-                            }}>vote</button>
-                        </>
+                        <vote.Form>
+                            <input type="hidden" name="brainstormId" value={params.id}/>
+                            <input type="hidden" name="id" value={sug.id} />
+                            <input type="text" name="suggestion" value={sug.description} />
+                            <input type="text" name="votes" value={sug.votes} />
+                            <input type="submit" value="vote" />
+                        </vote.Form>
                 }
             </For>
             <suggest.Form onSubmit={() => setTimeout(() => inputRef.value = "")}>
@@ -104,6 +97,7 @@ export default function BrainstormPage() {
 
 async function suggestFn(form: FormData) {
     const brainstormId = form.get('brainstormId') as string
+    console.log(brainstormId)
     const suggestion = form.get('suggestion') as string
     const response = await pb.collection('suggestions').create({
         brainstormId: brainstormId,
@@ -118,11 +112,18 @@ async function suggestFn(form: FormData) {
 async function voteFn(form: FormData) {
     const recordId = form.get('id') as string
     const suggestion = form.get('suggestion') as string
-    const votes = Number(form.get('votes') as string)
+    const incrementedVotes = Number(form.get('votes') as string) + 1
+    const brainstormId = form.get('brainstormId') as string
+    console.log(brainstormId)
 
-    const response = await pb.collection('suggestions').update(recordId, {
-        brainstormId: useParams().id,
+    const data = {
         suggestion: suggestion,
-        votes: votes + 1
-    })
+        votes: incrementedVotes,
+        brainstormId: brainstormId
+    }
+    
+    const response = await pb.collection('suggestions').update(recordId, data)
+    if (response) {
+        return redirect(useParams().id)
+    }
 }
