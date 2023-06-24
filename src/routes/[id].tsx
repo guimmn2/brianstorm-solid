@@ -1,5 +1,4 @@
-import { Record } from "pocketbase"
-import { For, Show, createResource, createSignal, onMount } from "solid-js"
+import { For, Show, createResource, onMount } from "solid-js"
 import { createRouteAction, createRouteData, redirect, useParams, useRouteData } from "solid-start"
 import { pb } from "~/pocketbase"
 
@@ -78,7 +77,7 @@ export default function BrainstormPage() {
                 {
                     (sug) =>
                         <vote.Form>
-                            <input type="hidden" name="brainstormId" value={params.id}/>
+                            <input type="hidden" name="brainstormId" value={params.id} />
                             <input type="hidden" name="id" value={sug.id} />
                             <input type="text" name="suggestion" value={sug.description} />
                             <input type="text" name="votes" value={sug.votes} />
@@ -97,7 +96,6 @@ export default function BrainstormPage() {
 
 async function suggestFn(form: FormData) {
     const brainstormId = form.get('brainstormId') as string
-    console.log(brainstormId)
     const suggestion = form.get('suggestion') as string
     const response = await pb.collection('suggestions').create({
         brainstormId: brainstormId,
@@ -114,14 +112,13 @@ async function voteFn(form: FormData) {
     const suggestion = form.get('suggestion') as string
     const incrementedVotes = Number(form.get('votes') as string) + 1
     const brainstormId = form.get('brainstormId') as string
-    console.log(brainstormId)
 
     const data = {
         suggestion: suggestion,
         votes: incrementedVotes,
         brainstormId: brainstormId
     }
-    
+
     const response = await pb.collection('suggestions').update(recordId, data)
     if (response) {
         return redirect(useParams().id)

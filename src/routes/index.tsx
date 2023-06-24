@@ -1,4 +1,4 @@
-import { Title, createRouteAction } from "solid-start";
+import { Title, createRouteAction, redirect } from "solid-start";
 import { pb } from "~/pocketbase";
 
 export default function Home() {
@@ -6,8 +6,7 @@ export default function Home() {
     const subject = form.get("subject") as string
     const response = await pb.collection('brainstorms').create({ title: subject })
     if (response) {
-      //redirect from solid-start was not working form some reason
-      window.location.replace(`${response.id}`)
+      return redirect(`${response.id}`)
     }
     else {
       console.error("something went wrong")
@@ -15,15 +14,15 @@ export default function Home() {
   })
 
   return (
-    <main>
+    <main class="flex flex-col justify-center h-80 text-5xl">
       <Title>Brianstorm</Title>
-      <h1 class="text-5xl">What do you wish to Brainstorm ?</h1>
+      <h1 class="mb-4 self-center">What do you wish to Brainstorm ?</h1>
       <setSubject.Form>
         <input
-          class="text-5xl"
+          class="w-full h-12 px-4 py-2 text-lg rounded-lg shadow-lg"
           type="text"
           name="subject"
-          placeholder="coolest waterparks to visit..."
+          placeholder="what do you wish to brainstorm ?"
         />
       </setSubject.Form>
     </main>
