@@ -1,4 +1,5 @@
-import { For, createResource, onMount } from "solid-js"
+import { Record } from "pocketbase"
+import { For, createResource, createSignal, onMount } from "solid-js"
 import { createRouteAction, redirect, useParams } from "solid-start"
 import { pb } from "~/pocketbase"
 
@@ -10,8 +11,7 @@ type Suggestion = {
 
 export default function BrainstormPage() {
     const params = useParams()
-    let inputRef!: HTMLInputElement
-    let brainstormTheme: string
+    const [theme, setTheme] = createSignal<string>()
     const [addingSuggestion, suggest] = createRouteAction(suggestFn)
     const [suggestions, { mutate }] = createResource(async () => {
         //fetch list
@@ -19,6 +19,11 @@ export default function BrainstormPage() {
             filter: `brainstormId = "${params.id}"`,
             expand: 'brainstormId'
         })
+        //set theme
+        //ignore this error
+        //@ts-ignore
+        setTheme(response[0].expand.brainstormId.title as string)
+        //parse
         let suggestions: Suggestion[] = []
         response.forEach(rec => {
             suggestions.push({
@@ -29,7 +34,7 @@ export default function BrainstormPage() {
         })
         return suggestions
     })
-    
+
     const orderedSuggestions = () => suggestions()?.sort((a, b) => b.votes - a.votes)
 
     //subscribe to chnages
@@ -57,8 +62,10 @@ export default function BrainstormPage() {
     }))
     //--
 
+    let inputRef!: HTMLInputElement
     return (
         <>
+            <h1>{theme()}</h1>
             <For each={orderedSuggestions()}>
                 {
                     (sug) =>
@@ -81,7 +88,7 @@ export default function BrainstormPage() {
             <suggest.Form onSubmit={() => setTimeout(() => inputRef.value = "")}>
                 <input type="hidden" name="brainstormId" value={params.id} />
                 <label for="suggestion">Add suggestion</label>
-                <input ref={inputRef} type="text" name="suggestion" id="suggestion" disabled={addingSuggestion.pending}/>
+                <input ref={inputRef} type="text" name="suggestion" id="suggestion" disabled={addingSuggestion.pending} />
             </suggest.Form>
         </>
     )
