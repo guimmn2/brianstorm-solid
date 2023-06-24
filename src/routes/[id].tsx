@@ -71,26 +71,39 @@ export default function BrainstormPage() {
 
     let inputRef!: HTMLInputElement
     return (
-        <>
-            <h1>{theme()}</h1>
+        <div class="flex flex-col ml-12 mt-12">
+            <h1 class="text-5xl mt-4 mb-8">{theme()} ?</h1>
             <For each={orderedSuggestions()}>
                 {
                     (sug) =>
-                        <vote.Form>
+                        <vote.Form class="mb-4 text-2xl">
                             <input type="hidden" name="brainstormId" value={params.id} />
                             <input type="hidden" name="id" value={sug.id} />
-                            <input type="text" name="suggestion" value={sug.description} />
-                            <input type="text" name="votes" value={sug.votes} />
-                            <input type="submit" value="vote" />
+                            <input 
+                            class="w-8/12"
+                            type="text" name="suggestion" value={sug.description} readonly/>
+                            <input 
+                            class="w-2/12"
+                            type="text" name="votes" value={sug.votes} readonly/>
+                            <input 
+                            class="rounded-lg w-24 h-12 ml-4 text-white text-md hover:bg-black font-bold cursor-pointer bg-slate-500"
+                            type="submit" value="+" />
                         </vote.Form>
                 }
             </For>
-            <suggest.Form onSubmit={() => setTimeout(() => inputRef.value = "")}>
+            <suggest.Form class="mt-4" onSubmit={() => setTimeout(() => inputRef.value = "")}>
                 <input type="hidden" name="brainstormId" value={params.id} />
-                <label for="suggestion">Add suggestion</label>
-                <input ref={inputRef} type="text" name="suggestion" id="suggestion" disabled={addingSuggestion.pending} />
+                <label class="mr-4" for="suggestion">Add suggestion</label>
+                <input 
+                ref={inputRef} 
+                type="text" 
+                name="suggestion" 
+                id="suggestion" 
+                disabled={addingSuggestion.pending} 
+                class="px-4 py-2 text-lg bg-gray-200 rounded-lg w-10/12 h-12"
+                />
             </suggest.Form>
-        </>
+        </div>
     )
 }
 
