@@ -1,2 +1,5 @@
-mostrar tema do brainstorm na página onde se fazem as sugestões e se vota
-meter bonito e interactivo e 'reactive' e tal
+X-mostrar tema do brainstorm na página onde se fazem as sugestões e se vota
+-meter bonito e interactivo e 'reactive' e tal
+-fazer com o que o input do user dê wrap em vez de ir para debaixo dos votos
+-ajustar tamanhos dos botões e inputs etc, talvez trocar os inputs fields por outras coisas, mas manter dentro do form
+

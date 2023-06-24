@@ -79,28 +79,28 @@ export default function BrainstormPage() {
                         <vote.Form class="mb-4 text-2xl">
                             <input type="hidden" name="brainstormId" value={params.id} />
                             <input type="hidden" name="id" value={sug.id} />
-                            <input 
-                            class="w-8/12"
-                            type="text" name="suggestion" value={sug.description} readonly/>
-                            <input 
-                            class="w-2/12"
-                            type="text" name="votes" value={sug.votes} readonly/>
-                            <input 
-                            class="rounded-lg w-24 h-12 ml-4 text-white text-md hover:bg-black font-bold cursor-pointer bg-slate-500"
-                            type="submit" value="+" />
+                            <input
+                                class="w-8/12"
+                                type="text" name="suggestion" value={sug.description} readonly />
+                            <input
+                                class="w-1/12"
+                                type="text" name="votes" value={sug.votes} readonly />
+                            <input
+                                class="rounded-lg w-28 h-12 ml-4 text-white text-md hover:bg-black font-bold cursor-pointer bg-slate-500"
+                                type="submit" value="+" />
                         </vote.Form>
                 }
             </For>
             <suggest.Form class="mt-4" onSubmit={() => setTimeout(() => inputRef.value = "")}>
                 <input type="hidden" name="brainstormId" value={params.id} />
-                <label class="mr-4" for="suggestion">Add suggestion</label>
-                <input 
-                ref={inputRef} 
-                type="text" 
-                name="suggestion" 
-                id="suggestion" 
-                disabled={addingSuggestion.pending} 
-                class="px-4 py-2 text-lg bg-gray-200 rounded-lg w-10/12 h-12"
+                <input
+                    ref={inputRef}
+                    type="text"
+                    name="suggestion"
+                    id="suggestion"
+                    disabled={addingSuggestion.pending}
+                    placeholder="add your suggestion"
+                    class="px-4 py-2 text-lg bg-gray-200 rounded-lg w-11/12 h-12"
                 />
             </suggest.Form>
         </div>
