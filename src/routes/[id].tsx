@@ -1,6 +1,6 @@
 import { Record } from "pocketbase"
-import { For, createResource, createSignal, onMount } from "solid-js"
-import { createRouteAction, redirect, useParams } from "solid-start"
+import { For, Show, createResource, createSignal, onMount } from "solid-js"
+import { createRouteAction, createRouteData, redirect, useParams, useRouteData } from "solid-start"
 import { pb } from "~/pocketbase"
 
 type Suggestion = {
@@ -9,20 +9,28 @@ type Suggestion = {
     votes: number
 }
 
+export function routeData() {
+    const theme = createRouteData(async () => {
+        const response = await pb.collection('brainstorms').getFirstListItem(`id = "${useParams().id}"`)
+        if (response) {
+            return response.title
+        }
+        //else error ?
+    })
+    return theme
+}
+
 export default function BrainstormPage() {
     const params = useParams()
-    const [theme, setTheme] = createSignal<string>()
+    const theme = useRouteData<typeof routeData>()
     const [addingSuggestion, suggest] = createRouteAction(suggestFn)
+    const [voting, vote] = createRouteAction(voteFn)
     const [suggestions, { mutate }] = createResource(async () => {
         //fetch list
         const response = await pb.collection('suggestions').getFullList({
             filter: `brainstormId = "${params.id}"`,
             expand: 'brainstormId'
         })
-        //set theme
-        //ignore this error
-        //@ts-ignore
-        setTheme(response[0].expand.brainstormId.title as string)
         //parse
         let suggestions: Suggestion[] = []
         response.forEach(rec => {
@@ -105,4 +113,16 @@ async function suggestFn(form: FormData) {
     if (response) {
         return redirect(useParams().id)
     }
+}
+
+async function voteFn(form: FormData) {
+    const recordId = form.get('id') as string
+    const suggestion = form.get('suggestion') as string
+    const votes = Number(form.get('votes') as string)
+
+    const response = await pb.collection('suggestions').update(recordId, {
+        brainstormId: useParams().id,
+        suggestion: suggestion,
+        votes: votes + 1
+    })
 }
